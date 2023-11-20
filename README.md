@@ -24,7 +24,7 @@ The challenge of this project will be in the complexity of writing a JSON tokeni
 We will use a relatively simple class structure.
 - `JSONReader` will be the main class that will be used to read the JSON file and provide access to the data.
 - `Token` will be a class that will represent a token. It will have a type and a value.
-- `Tokenizer`` will be a class that will read the JSON file and split it into tokens.
+- `Tokenizer` will be a class that will read the JSON file and split it into tokens.
 - `Parser` will be a class that will read the tokens and create a tree structure that can be used to access the data.
 
 If we have time, we will add a `JSONWriter` class that will be able to write a JSON file from the data. This will be a good way to test the `JSONReader` class.
