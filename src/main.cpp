@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
 
     std::ifstream ifs(argv[1]);
     
-    auto js = JSONReader::read(ifs);
+    auto js = json_reader::read_json(ifs);
     if (!js) {
         std::cout << "Failed to parse" << std::endl;
         return 1;
