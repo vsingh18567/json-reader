@@ -54,26 +54,64 @@ Value Parser::expect_value() {
   auto &token = tokenizer[idx];
   if (token.type == TokenType::STRING) {
     idx++;
-    return Value(ValueType::STRING, token.s_val);
+    return Value(ValueType::STRING, std::make_shared<std::string>(token.s_val));
   } else if (token.type == TokenType::INT) {
     idx++;
-    return Value(ValueType::INT, token.int_val);
+    return Value(ValueType::INT, std::make_shared<int>(token.int_val));
   } else if (token.type == TokenType::OPEN_BRACE) {
     depth += 4;
-    auto val = Value(ValueType::OBJECT, expect_object());
+    auto val =
+        Value(ValueType::OBJECT, std::make_shared<Object>(expect_object()));
     depth -= 4;
     return val;
   } else if (token.type == TokenType::TRUE) {
     idx++;
-    return Value(ValueType::BOOL, true);
+    return Value(ValueType::BOOL, std::make_shared<bool>(true));
   } else if (token.type == TokenType::FALSE) {
     idx++;
-    return Value(ValueType::BOOL, false);
+    return Value(ValueType::BOOL, std::make_shared<bool>(false));
+  } else if (token.type == TokenType::LEFT_BRACKET) {
+    depth += 4;
+    auto val = Value(ValueType::ARRAY, std::make_shared<Array>(expect_array()));
+    depth -= 4;
+    return val;
   } else {
     std::cout << "Error: expected value at line " << token.line << ", col "
               << token.col << std::endl;
     exit(1);
   }
+}
+
+Array Parser::expect_array() {
+  if (tokenizer.tokens().size() == 0) {
+    std::cout << "Error: empty input" << std::endl;
+    exit(1);
+  }
+  auto &token = tokenizer[idx];
+  if (token.type != TokenType::LEFT_BRACKET) {
+    std::cout << "Error: expected '[' at line " << token.line << ", col "
+              << token.col << std::endl;
+    exit(1);
+  }
+
+  idx++;
+  Array arr(depth);
+  while (idx < tokenizer.tokens().size()) {
+    auto &token = tokenizer[idx];
+
+    if (token.type == TokenType::RIGHT_BRACKET) {
+      idx++;
+      return arr;
+    } else {
+      arr.elements.push_back(expect_value());
+      if (tokenizer[idx].type == TokenType::COMMA) {
+        idx++;
+      }
+    }
+  }
+  std::cout << "Error: expected ']' at line " << token.line << ", col "
+            << token.col << std::endl;
+  exit(1);
 }
 
 JSON Parser::parse() {
@@ -94,6 +132,19 @@ std::string Object::to_str() const {
   return s;
 }
 
+std::string Array::to_str() const {
+  std::string s = "[\n";
+  for (auto &val : elements) {
+    s += std::string(depth, ' ') + val.to_str() + ", \n";
+  }
+  s.pop_back();
+  s.pop_back();
+  s.pop_back();
+
+  s += "\n" + std::string(std::max(depth - 4, 0), ' ') + "]";
+  return s;
+}
+
 std::ostream &operator<<(std::ostream &os, const Object &jo) {
   os << jo.to_str();
   return os;
@@ -109,43 +160,48 @@ std::ostream &operator<<(std::ostream &os, const JSON &json) {
   return os;
 }
 
-void Object::insert(const std::string key, const Value val) {
-  elements.insert({key, val});
+std::ostream &operator<<(std::ostream &os, const Array &ja) {
+  os << ja.to_str();
+  return os;
 }
 
 Value &Object::operator[](const std::string key) { return elements[key]; }
 
-template <typename T> T &Object::get(const std::string &key) {
-  if (std::get_if<T>(&elements.at(key).value)) {
-    return std::get<T>(elements.at(key).value);
+template <typename T> sPtr<T> Object::get(const std::string &key) {
+  if (std::get_if<sPtr<T>>(&elements.at(key).value)) {
+    return std::get<sPtr<T>>(elements.at(key).value);
   }
   throw std::runtime_error("Error: expected type " +
                            std::string(typeid(T).name()) + " at key " + key);
 }
 
 template <typename T>
-T &Object::get(const std::string &key, const T default_val) {
+sPtr<T> Object::get(const std::string &key, const T default_val) {
   if (elements.find(key) == elements.end()) {
     return default_val;
   }
-  if (std::get_if<T>(&elements.at(key).value)) {
-    return std::get<T>(elements.at(key).value);
+  if (std::get_if<sPtr<T>>(&elements.at(key).value)) {
+    return std::get<sPtr<T>>(elements.at(key).value);
   } else {
     return default_val;
   }
 }
 
-template <typename T>
-std::optional<T &> Object::try_get(const std::string &key) {
+template <typename T> sPtr<T> Object::try_get(const std::string &key) {
   if (elements.find(key) == elements.end()) {
-    return std::nullopt;
+    return nullptr;
   }
-  if (std::get_if<T>(&elements.at(key).value)) {
-    return std::get<T>(elements.at(key).value);
+  if (std::get_if<sPtr<T>>(&elements.at(key).value)) {
+    return std::get<sPtr<T>>(elements.at(key).value);
   } else {
-    return std::nullopt;
+    return nullptr;
   }
 }
+
+template <typename T> void Object::insert(const std::string key, T val) {
+  elements.insert({key, Value(val)});
+}
+
 /*
 
 

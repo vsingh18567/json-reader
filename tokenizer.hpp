@@ -10,7 +10,9 @@ enum class TokenType {
   COLON,
   COMMA,
   TRUE,
-  FALSE
+  FALSE,
+  LEFT_BRACKET,
+  RIGHT_BRACKET,
 };
 
 struct Token {

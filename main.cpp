@@ -11,7 +11,8 @@ int main(int argc, char **argv) {
   std::ifstream ifs(argv[1]);
 
   auto js = read_json(ifs).value();
-  auto nested = js.root.get<Object>("nested").try_get<std::string>("nest");
-  // nested.insert("number2", Value(42));
+  auto nested = js.root.get<Object>("nested");
+  nested->insert("number2", Value(42));
+  js.root.get<Array>("array")->elements.push_back(Value(42));
   std::cout << js << std::endl;
 }

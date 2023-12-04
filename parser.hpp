@@ -6,11 +6,14 @@
 #include <unordered_map>
 #include <variant>
 
+#define sPtr std::shared_ptr
+
 enum class ValueType {
   STRING,
   INT,
   OBJECT,
   BOOL,
+  ARRAY,
 };
 
 struct Value;
@@ -27,48 +30,68 @@ public:
   Object(int depth) : depth(depth) {}
   friend std::ostream &operator<<(std::ostream &os, const Object &jo);
 
-  void insert(const std::string key, const Value val);
+  template <typename T> void insert(const std::string key, T val);
 
   Value &operator[](const std::string key);
 
-  template <typename T> T &get(const std::string &key);
-
-  template <typename T> T &get(const std::string &key, const T default_val);
-
-  template <typename T> std::optional<T &> try_get(const std::string &key);
+  template <typename T> sPtr<T> get(const std::string &key);
+  template <typename T>
+  sPtr<T> get(const std::string &key, const T default_val);
+  template <typename T> sPtr<T> try_get(const std::string &key);
 };
 
-using val_t = std::variant<int, bool, std::string, Object>;
+struct Array {
+private:
+  int depth;
+
+public:
+  std::vector<Value> elements;
+  std::string to_str() const;
+  Array(int depth) : depth(depth) {}
+  Value &operator[](int idx) { return elements[idx]; }
+  friend std::ostream &operator<<(std::ostream &os, const Array &ja);
+};
+
+using val_t = std::variant<sPtr<int>, sPtr<bool>, sPtr<std::string>,
+                           sPtr<Object>, sPtr<Array>>;
 
 struct Value {
   ValueType type;
   val_t value;
   Value() {}
-  Value(int value) : type(ValueType::INT), value(value) {}
-  Value(bool value) : type(ValueType::BOOL), value(value) {}
-  Value(std::string value) : type(ValueType::STRING), value(value) {}
-  Value(Object value) : type(ValueType::OBJECT), value(value) {}
+  Value(int value)
+      : type(ValueType::INT), value(std::make_shared<int>(value)) {}
+  Value(bool value)
+      : type(ValueType::BOOL), value(std::make_shared<bool>(value)) {}
+  Value(std::string value)
+      : type(ValueType::STRING), value(std::make_shared<std::string>(value)) {}
+  Value(Object value)
+      : type(ValueType::OBJECT), value(std::make_shared<Object>(value)) {}
+  Value(Array value)
+      : type(ValueType::ARRAY), value(std::make_shared<Array>(value)) {}
   Value(ValueType t, val_t value) : type(t), value(value) {}
   std::string to_str() const {
     switch (type) {
     case ValueType::STRING:
-      return "\"" + std::get<std::string>(value) + "\"";
+      return "\"" + *std::get<sPtr<std::string>>(value) + "\"";
     case ValueType::INT:
-      return std::to_string(std::get<int>(value));
+      return std::to_string(*std::get<sPtr<int>>(value));
     case ValueType::OBJECT:
-      return std::get<Object>(value).to_str();
+      return std::get<sPtr<Object>>(value)->to_str();
     case ValueType::BOOL:
-      return std::get<bool>(value) ? "true" : "false";
+      return std::get<sPtr<bool>>(value) ? "true" : "false";
+    case ValueType::ARRAY:
+      return std::get<sPtr<Array>>(value)->to_str();
     }
   }
 
   template <typename T> T &cast() { return std::get<T>(value); }
 
-  template <typename T> std::optional<T> &try_cast() {
-    if (const T *val = std::get_if<T>(value)) {
-      return *val;
+  template <typename T> sPtr<T> try_cast() {
+    if (std::get_if<sPtr<T>>(value)) {
+      return std::get<sPtr<T>>(value);
     } else {
-      return std::nullopt;
+      return nullptr;
     }
   }
 
@@ -92,6 +115,7 @@ private:
   JSON object;
   Object expect_object();
   Value expect_value();
+  Array expect_array();
 
 public:
   Parser(Tokenizer &tokenizer) : tokenizer(tokenizer) {}

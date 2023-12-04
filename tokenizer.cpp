@@ -4,21 +4,25 @@
 std::string Token::to_str() {
   switch (type) {
   case TokenType::OPEN_BRACE:
-    return "OPEN_BRACE";
+    return "{";
   case TokenType::CLOSE_BRACE:
-    return "CLOSE_BRACE";
+    return "}";
   case TokenType::STRING:
     return "STRING: " + s_val;
   case TokenType::INT:
     return "INT: " + std::to_string(int_val);
   case TokenType::COLON:
-    return "COLON";
+    return ":";
   case TokenType::COMMA:
-    return "COMMA";
+    return ",";
   case TokenType::TRUE:
     return "TRUE";
   case TokenType::FALSE:
     return "FALSE";
+  case TokenType::LEFT_BRACKET:
+    return "[";
+  case TokenType::RIGHT_BRACKET:
+    return "]";
   }
 }
 
@@ -47,6 +51,14 @@ void Tokenizer::tokenize() {
       col++;
     } else if (s[idx] == '}') {
       _tokens.push_back(Token(TokenType::CLOSE_BRACE, line, col));
+      idx++;
+      col++;
+    } else if (s[idx] == '[') {
+      _tokens.push_back(Token(TokenType::LEFT_BRACKET, line, col));
+      idx++;
+      col++;
+    } else if (s[idx] == ']') {
+      _tokens.push_back(Token(TokenType::RIGHT_BRACKET, line, col));
       idx++;
       col++;
     } else if (s[idx] == '"') {
