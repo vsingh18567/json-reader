@@ -10,7 +10,7 @@ std::string Token::to_str() {
   case TokenType::STRING:
     return "STRING: " + s_val;
   case TokenType::NUMBER:
-    return "INT: " + std::to_string(int_val);
+    return "NUMBER: " + std::to_string(int_val);
   case TokenType::COLON:
     return ":";
   case TokenType::COMMA:

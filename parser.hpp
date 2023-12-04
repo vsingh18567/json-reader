@@ -10,7 +10,7 @@
 
 enum class ValueType {
   STRING,
-  INT,
+  NUMBER,
   OBJECT,
   BOOL,
   ARRAY,
@@ -52,15 +52,15 @@ public:
   friend std::ostream &operator<<(std::ostream &os, const Array &ja);
 };
 
-using val_t = std::variant<sPtr<int>, sPtr<bool>, sPtr<std::string>,
+using val_t = std::variant<sPtr<float>, sPtr<bool>, sPtr<std::string>,
                            sPtr<Object>, sPtr<Array>>;
 
 struct Value {
   ValueType type;
   val_t value;
   Value() {}
-  Value(int value)
-      : type(ValueType::INT), value(std::make_shared<int>(value)) {}
+  Value(float value)
+      : type(ValueType::NUMBER), value(std::make_shared<float>(value)) {}
   Value(bool value)
       : type(ValueType::BOOL), value(std::make_shared<bool>(value)) {}
   Value(std::string value)
@@ -74,8 +74,8 @@ struct Value {
     switch (type) {
     case ValueType::STRING:
       return "\"" + *std::get<sPtr<std::string>>(value) + "\"";
-    case ValueType::INT:
-      return std::to_string(*std::get<sPtr<int>>(value));
+    case ValueType::NUMBER:
+      return std::to_string(*std::get<sPtr<float>>(value));
     case ValueType::OBJECT:
       return std::get<sPtr<Object>>(value)->to_str();
     case ValueType::BOOL:
@@ -85,7 +85,7 @@ struct Value {
     }
   }
 
-  template <typename T> T &cast() { return std::get<T>(value); }
+  template <typename T> sPtr<T> cast() { return std::get<sPtr<T>>(value); }
 
   template <typename T> sPtr<T> try_cast() {
     if (std::get_if<sPtr<T>>(value)) {
@@ -121,7 +121,6 @@ public:
   Parser(Tokenizer &tokenizer) : tokenizer(tokenizer) {}
   JSON parse();
 };
-// namespace json_reader
 
 #include "parser.tpp"
 #endif

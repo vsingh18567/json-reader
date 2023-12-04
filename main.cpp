@@ -1,5 +1,5 @@
 #include "json_reader.hpp"
-#include "nlohmann_json.hpp"
+#include "nlohmann/nlohmann_json.hpp"
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -49,12 +49,20 @@ void benchmark() {
   time_taken("2000.json");
   std::cout << "5000 lines" << std::endl;
   time_taken("5000.json");
+  std::cout << "10000 lines" << std::endl;
+  time_taken("10000.json");
 }
 
 int main(int argc, char **argv) {
-  if (argc != 2) {
-    std::cout << "Usage: " << argv[0] << " <json file>" << std::endl;
-    return 1;
-  }
   benchmark();
+
+  std::ifstream ifs("simple.json");
+  auto js = read_json(ifs).value();
+  std::cout << js << std::endl;
+  auto nested = js["nested"];
+  auto nested_obj = nested.cast<Object>();
+  std::cout << *nested_obj->get<std::string>("foo") << std::endl;
+
+  auto nested2 = js.root.get<Object>("nested");
+  std::cout << (nested2 == nested_obj) << std::endl;
 }

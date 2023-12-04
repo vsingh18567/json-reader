@@ -52,30 +52,31 @@ Value Parser::expect_value() {
     exit(1);
   }
   auto &token = tokenizer[idx];
-  if (token.type == TokenType::STRING) {
+  Value val;
+  switch (token.type) {
+  case TokenType::STRING:
     idx++;
     return Value(ValueType::STRING, std::make_shared<std::string>(token.s_val));
-  } else if (token.type == TokenType::NUMBER) {
+  case TokenType::NUMBER:
     idx++;
-    return Value(ValueType::INT, std::make_shared<int>(token.int_val));
-  } else if (token.type == TokenType::OPEN_BRACE) {
+    return Value(ValueType::NUMBER, std::make_shared<float>(token.int_val));
+  case TokenType::OPEN_BRACE:
     depth += 4;
-    auto val =
-        Value(ValueType::OBJECT, std::make_shared<Object>(expect_object()));
+    val = Value(ValueType::OBJECT, std::make_shared<Object>(expect_object()));
     depth -= 4;
     return val;
-  } else if (token.type == TokenType::TRUE) {
+  case TokenType::TRUE:
     idx++;
     return Value(ValueType::BOOL, std::make_shared<bool>(true));
-  } else if (token.type == TokenType::FALSE) {
+  case TokenType::FALSE:
     idx++;
     return Value(ValueType::BOOL, std::make_shared<bool>(false));
-  } else if (token.type == TokenType::LEFT_BRACKET) {
+  case TokenType::LEFT_BRACKET:
     depth += 4;
-    auto val = Value(ValueType::ARRAY, std::make_shared<Array>(expect_array()));
+    val = Value(ValueType::ARRAY, std::make_shared<Array>(expect_array()));
     depth -= 4;
     return val;
-  } else {
+  default:
     std::cout << "Error: expected value at line " << token.line << ", col "
               << token.col << std::endl;
     exit(1);
