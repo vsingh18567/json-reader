@@ -4,7 +4,7 @@
 ## Description
 This is a simple JSON reader library that can read a JSON file and provide a way to access the data.
 
-Key features:
+Key features: 
 - Tokenizer for JSON files
 - Parser for JSON files
 - Interface to access the data
