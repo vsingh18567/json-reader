@@ -15,14 +15,14 @@ enum class ValueType {
 
 struct JSONValue;
 
-
-
-
 struct JSONObject {
+    int depth = 0;
     std::unordered_map<std::string, JSONValue> elements;
-    std::string to_str(); 
+    std::string to_str() const; 
 
     JSONObject() {}
+    JSONObject(int depth) : depth(depth) {}
+    friend std::ostream& operator<<(std::ostream& os, const JSONObject& jo);
 };
 
 using val_t = std::variant<int, bool, std::string, JSONObject>;
@@ -33,7 +33,7 @@ struct JSONValue {
     val_t value;
     JSONValue() {}
     JSONValue(ValueType t, val_t value ) : type(t), value(value) {}
-    std::string to_str() {
+    std::string to_str() const {
         switch (type) {
             case ValueType::STRING:
                 return "\"" + std::get<std::string>(value) + "\"";
@@ -46,22 +46,27 @@ struct JSONValue {
         }
     
     }
+    friend std::ostream& operator<<(std::ostream& os, const JSONValue& jv);
 
 };
 
 
 struct JSON {
+
     JSONObject root;    
-    std::string to_str() {
+    std::string to_str() const {
         return root.to_str();
-    
     }
+
+    friend std::ostream& operator<<(std::ostream& os, const JSON& json);
+
 };
 
 class Parser {
 private:
     Tokenizer& tokenizer;
     int idx = 0;
+    int depth = 0;
     JSON object;
     JSONObject expect_object();
     JSONValue expect_value();

@@ -89,7 +89,7 @@ std::string JSONObject::to_str() const {
         s.pop_back();
         s.pop_back();
         
-        s += "\n" + std::string(std::max(depth - 1, 0), ' ') + "}";
+        s += "\n" + std::string(std::max(depth - 4, 0), ' ') + "}";
         return s;
 }
 
