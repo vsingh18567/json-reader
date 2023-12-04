@@ -1,7 +1,4 @@
-#include "parser.hpp"
-#include <iostream>
 
-using namespace json_reader;
 
 Object Parser::expect_object() {
   if (tokenizer.tokens().size() == 0) {
@@ -97,21 +94,58 @@ std::string Object::to_str() const {
   return s;
 }
 
-std::ostream &json_reader::operator<<(std::ostream &os, const Object &jo) {
+std::ostream &operator<<(std::ostream &os, const Object &jo) {
   os << jo.to_str();
   return os;
 }
 
-std::ostream &json_reader::operator<<(std::ostream &os, const Value &jv) {
+std::ostream &operator<<(std::ostream &os, const Value &jv) {
   os << jv.to_str();
   return os;
 }
 
-std::ostream &json_reader::operator<<(std::ostream &os, const JSON &json) {
+std::ostream &operator<<(std::ostream &os, const JSON &json) {
   os << json.to_str();
   return os;
 }
 
+void Object::insert(const std::string key, const Value val) {
+  elements.insert({key, val});
+}
+
+Value &Object::operator[](const std::string key) { return elements[key]; }
+
+template <typename T> T &Object::get(const std::string &key) {
+  if (std::get_if<T>(&elements.at(key).value)) {
+    return std::get<T>(elements.at(key).value);
+  }
+  throw std::runtime_error("Error: expected type " +
+                           std::string(typeid(T).name()) + " at key " + key);
+}
+
+template <typename T>
+T &Object::get(const std::string &key, const T default_val) {
+  if (elements.find(key) == elements.end()) {
+    return default_val;
+  }
+  if (std::get_if<T>(&elements.at(key).value)) {
+    return std::get<T>(elements.at(key).value);
+  } else {
+    return default_val;
+  }
+}
+
+template <typename T>
+std::optional<T &> Object::try_get(const std::string &key) {
+  if (elements.find(key) == elements.end()) {
+    return std::nullopt;
+  }
+  if (std::get_if<T>(&elements.at(key).value)) {
+    return std::get<T>(elements.at(key).value);
+  } else {
+    return std::nullopt;
+  }
+}
 /*
 
 

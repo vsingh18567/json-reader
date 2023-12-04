@@ -1,12 +1,10 @@
+#ifndef PARSER_HPP
+#define PARSER_HPP
 #include "tokenizer.hpp"
+#include <iostream>
 #include <memory>
 #include <unordered_map>
 #include <variant>
-
-namespace json_reader {
-
-#define uPtr std::unique_ptr
-#define mk_uPtr std::make_unique
 
 enum class ValueType {
   STRING,
@@ -18,13 +16,26 @@ enum class ValueType {
 struct Value;
 
 struct Object {
+private:
   int depth = 0;
+
+public:
   std::unordered_map<std::string, Value> elements;
   std::string to_str() const;
 
   Object() {}
   Object(int depth) : depth(depth) {}
   friend std::ostream &operator<<(std::ostream &os, const Object &jo);
+
+  void insert(const std::string key, const Value val);
+
+  Value &operator[](const std::string key);
+
+  template <typename T> T &get(const std::string &key);
+
+  template <typename T> T &get(const std::string &key, const T default_val);
+
+  template <typename T> std::optional<T &> try_get(const std::string &key);
 };
 
 using val_t = std::variant<int, bool, std::string, Object>;
@@ -33,6 +44,10 @@ struct Value {
   ValueType type;
   val_t value;
   Value() {}
+  Value(int value) : type(ValueType::INT), value(value) {}
+  Value(bool value) : type(ValueType::BOOL), value(value) {}
+  Value(std::string value) : type(ValueType::STRING), value(value) {}
+  Value(Object value) : type(ValueType::OBJECT), value(value) {}
   Value(ValueType t, val_t value) : type(t), value(value) {}
   std::string to_str() const {
     switch (type) {
@@ -46,6 +61,17 @@ struct Value {
       return std::get<bool>(value) ? "true" : "false";
     }
   }
+
+  template <typename T> T &cast() { return std::get<T>(value); }
+
+  template <typename T> std::optional<T> &try_cast() {
+    if (const T *val = std::get_if<T>(value)) {
+      return *val;
+    } else {
+      return std::nullopt;
+    }
+  }
+
   friend std::ostream &operator<<(std::ostream &os, const Value &jv);
 };
 
@@ -55,11 +81,12 @@ struct JSON {
   std::string to_str() const { return root.to_str(); }
 
   friend std::ostream &operator<<(std::ostream &os, const JSON &json);
+  Value &operator[](const std::string key) { return root[key]; }
 };
 
 class Parser {
 private:
-  json_reader::Tokenizer &tokenizer;
+  Tokenizer &tokenizer;
   int idx = 0;
   int depth = 0;
   JSON object;
@@ -67,7 +94,10 @@ private:
   Value expect_value();
 
 public:
-  Parser(json_reader::Tokenizer &tokenizer) : tokenizer(tokenizer) {}
+  Parser(Tokenizer &tokenizer) : tokenizer(tokenizer) {}
   JSON parse();
 };
-} // namespace json_reader
+// namespace json_reader
+
+#include "parser.tpp"
+#endif

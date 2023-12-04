@@ -2,7 +2,6 @@
 #include <string>
 #include <vector>
 
-namespace json_reader {
 enum class TokenType {
   OPEN_BRACE,
   CLOSE_BRACE,
@@ -42,4 +41,3 @@ public:
   void print_tokens();
   Token &operator[](int idx) { return _tokens[idx]; }
 };
-} // namespace json_reader
