@@ -97,6 +97,10 @@ struct Value {
     }
   }
 
+  Value &operator[](const std::string key) {
+    return std::get<sPtr<Object>>(value)->operator[](key);
+  }
+
   friend std::ostream &operator<<(std::ostream &os, const Value &jv);
 };
 

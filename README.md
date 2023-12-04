@@ -29,6 +29,9 @@ Benchmarked against [nlohmann](https://json.nlohmann.me/integration/)'s JSON-rea
     obj.insert("key", Value("value"));
     obj.insert("key2", 2); // don't need to wrap primitive types in a Value object
     js.root.insert("new_obj", obj); // insert a new key-value pair with an object as the value
+
+    Value &val = js.root["new_obj"]["key2"]; // access a value by chaining the keys
+
 ```
 
 ## Some cpp features used
