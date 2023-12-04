@@ -203,6 +203,15 @@ template <typename T> void Object::insert(const std::string key, T val) {
   elements.insert({key, Value(val)});
 }
 
+template <> void Object::insert(const std::string key, Value val) {
+  elements.insert({key, val});
+}
+
+template <> void Object::insert(const std::string key, Object val) {
+  val.depth = depth + 4;
+  elements.insert({key, Value(val)});
+}
+
 /*
 
 

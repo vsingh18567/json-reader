@@ -92,6 +92,10 @@ void Tokenizer::tokenize() {
                                   (s[end] == '-' && end == start) ||
                                   (s[end] == '.' && !found_decimal))) {
 
+        if (s[end] == '.') {
+          found_decimal = true;
+        }
+
         end++;
         col++;
       }

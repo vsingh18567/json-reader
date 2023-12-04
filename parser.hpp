@@ -59,6 +59,8 @@ struct Value {
   ValueType type;
   val_t value;
   Value() {}
+  Value(int value)
+      : type(ValueType::NUMBER), value(std::make_shared<float>(value)) {}
   Value(float value)
       : type(ValueType::NUMBER), value(std::make_shared<float>(value)) {}
   Value(bool value)

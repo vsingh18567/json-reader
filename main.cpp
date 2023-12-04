@@ -65,4 +65,13 @@ int main(int argc, char **argv) {
 
   auto nested2 = js.root.get<Object>("nested");
   std::cout << (nested2 == nested_obj) << std::endl;
+  js.root.insert("new_key", Value("new_value")); // insert a new key-value pair
+
+  Object obj;
+  obj.insert("key", Value("value"));
+  obj.insert("key2", Value(2));
+  js.root.insert(
+      "new_obj",
+      obj); // insert a new key-value pair with an object as the value
+  std::cout << js << std::endl;
 }
