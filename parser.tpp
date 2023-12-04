@@ -55,7 +55,7 @@ Value Parser::expect_value() {
   if (token.type == TokenType::STRING) {
     idx++;
     return Value(ValueType::STRING, std::make_shared<std::string>(token.s_val));
-  } else if (token.type == TokenType::INT) {
+  } else if (token.type == TokenType::NUMBER) {
     idx++;
     return Value(ValueType::INT, std::make_shared<int>(token.int_val));
   } else if (token.type == TokenType::OPEN_BRACE) {

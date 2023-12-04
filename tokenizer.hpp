@@ -6,7 +6,7 @@ enum class TokenType {
   OPEN_BRACE,
   CLOSE_BRACE,
   STRING,
-  INT,
+  NUMBER,
   COLON,
   COMMA,
   TRUE,

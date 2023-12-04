@@ -4,3 +4,4 @@ json-reader
 bin/
 obj/
 .vscode/
+*.json

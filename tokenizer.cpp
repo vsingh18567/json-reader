@@ -9,7 +9,7 @@ std::string Token::to_str() {
     return "}";
   case TokenType::STRING:
     return "STRING: " + s_val;
-  case TokenType::INT:
+  case TokenType::NUMBER:
     return "INT: " + std::to_string(int_val);
   case TokenType::COLON:
     return ":";
@@ -84,17 +84,21 @@ void Tokenizer::tokenize() {
       _tokens.push_back(Token(TokenType::COMMA, line, col));
       idx++;
       col++;
-    } else if (s[idx] >= '0' && s[idx] <= '9') {
+    } else if ((s[idx] >= '0' && s[idx] <= '9') || s[idx] == '-') {
       int start = idx;
       int end = start;
-      while (end < s.length() && s[end] >= '0' && s[end] <= '9') {
+      bool found_decimal = false;
+      while (end < s.length() && ((s[end] >= '0' && s[end] <= '9') ||
+                                  (s[end] == '-' && end == start) ||
+                                  (s[end] == '.' && !found_decimal))) {
+
         end++;
         col++;
       }
-      _tokens.push_back(Token(
-          TokenType::INT, std::stoi(s.substr(start, end - start)), line, col));
+      _tokens.push_back(Token(TokenType::NUMBER,
+                              std::stoi(s.substr(start, end - start)), line,
+                              col));
       idx = end;
-
     } else if (s[idx] == '\n') {
       line++;
       col = 1;
@@ -103,6 +107,8 @@ void Tokenizer::tokenize() {
       idx++;
     } else {
       _succeeded = false;
+      std::cout << "Error: unexpected character '" << s[idx] << "' at line "
+                << line << ", col " << col << std::endl;
       return;
     }
   }
