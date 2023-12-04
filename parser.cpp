@@ -2,7 +2,6 @@
 #include <iostream>
 
 
-
 JSONObject Parser::expect_object() {
     if (tokenizer.tokens().size() == 0) {
         std::cout << "Error: empty input" << std::endl;
@@ -15,14 +14,11 @@ JSONObject Parser::expect_object() {
     }
 
     idx++;
-    JSONObject obj;
+    JSONObject obj(depth);
     while (idx < tokenizer.tokens().size()) {
-        std::cout << "idx: " << idx << std::endl;
         auto& token = tokenizer[idx];
-        std::cout << "token: " << token.to_str() << std::endl;
 
         if (token.type == TokenType::CLOSE_BRACE) {
-            std::cout << "found close brace" << std::endl;
             idx++;
             return obj;
         } else if (token.type == TokenType::STRING) {
@@ -63,7 +59,10 @@ JSONValue Parser::expect_value() {
         idx++;
         return JSONValue(ValueType::INT, token.int_val);
     } else if (token.type == TokenType::OPEN_BRACE) {
-        return JSONValue(ValueType::OBJECT, expect_object());
+        depth += 4;
+        auto val = JSONValue(ValueType::OBJECT, expect_object());
+        depth -= 4;
+        return val;
     } else if (token.type == TokenType::TRUE) {
         idx++;
         return JSONValue(ValueType::BOOL, true );
@@ -81,17 +80,35 @@ JSON Parser::parse() {
     return object;
 }
 
-std::string JSONObject::to_str() {
-        std::string s = "{";
+std::string JSONObject::to_str() const {
+        std::string s =  "{\n";
         for (auto& [key, val] : elements) {
-            s += "\"" + key + "\": " + val.to_str() + ", \n";
+            s += std::string(depth, ' ')  + "\"" + key + "\": " + val.to_str() + ", \n";
         }
         s.pop_back();
         s.pop_back();
         s.pop_back();
-        s += "\n}";
+        
+        s += "\n" + std::string(std::max(depth - 1, 0), ' ') + "}";
         return s;
 }
+
+std::ostream& operator<<(std::ostream& os, const JSONObject& jo) {
+    os << jo.to_str();
+    return os;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const JSONValue& jv) {
+    os << jv.to_str();
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const JSON& json) {
+    os << json.to_str();
+    return os;
+}
+
 
 /*
 

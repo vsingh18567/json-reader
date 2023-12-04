@@ -9,21 +9,13 @@ int main(int argc, char** argv) {
     }
 
     std::ifstream ifs(argv[1]);
-    std::string s((std::istreambuf_iterator<char>(ifs)),
-                 (std::istreambuf_iterator<char>()));
-
-    Tokenizer tokenizer(s);
-    if (!tokenizer.succeeded()) {
-        std::cout << "Failed to tokenize" << std::endl;
-        return 1;
-    }
     
-    auto js = JSONReader::read(s);
+    auto js = JSONReader::read(ifs);
     if (!js) {
         std::cout << "Failed to parse" << std::endl;
         return 1;
     }
-    std::cout << js->to_str() << std::endl;
+    std::cout << js.value() << std::endl;
     
 
 }
