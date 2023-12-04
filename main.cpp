@@ -58,7 +58,6 @@ int main(int argc, char **argv) {
 
   std::ifstream ifs("simple.json");
   auto js = read_json(ifs).value();
-  std::cout << js << std::endl;
   auto nested = js["nested"];
   auto nested_obj = nested.cast<Object>();
   std::cout << *nested_obj->get<std::string>("foo") << std::endl;

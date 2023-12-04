@@ -2,14 +2,13 @@
 
 Object Parser::expect_object() {
   if (tokenizer.tokens().size() == 0) {
-    std::cout << "Error: empty input" << std::endl;
-    exit(1);
+    throw std::runtime_error("Error: empty input");
   }
   auto &token = tokenizer[idx];
   if (token.type != TokenType::OPEN_BRACE) {
-    std::cout << "Error: expected '{' at line " << token.line << ", col "
-              << token.col << std::endl;
-    exit(1);
+    throw std::runtime_error("Error: expected '{' at line " +
+                             std::to_string(token.line) + ", col " +
+                             std::to_string(token.col));
   }
 
   idx++;
@@ -24,9 +23,9 @@ Object Parser::expect_object() {
       std::string key = token.s_val;
       idx++;
       if (tokenizer[idx].type != TokenType::COLON) {
-        std::cout << "Error: expected ':' at line " << token.line << ", col "
-                  << token.col << std::endl;
-        exit(1);
+        throw std::runtime_error("Error: expected ':' at line " +
+                                 std::to_string(token.line) + ", col " +
+                                 std::to_string(token.col));
       }
       idx++;
       auto val = expect_value();
@@ -35,21 +34,20 @@ Object Parser::expect_object() {
         idx++;
       }
     } else {
-      std::cout << "Error: expected STRING at line " << token.line << ", col "
-                << token.col << std::endl;
-      exit(1);
+      throw std::runtime_error("Error: expected STRING at line " +
+                               std::to_string(token.line) + ", col " +
+                               std::to_string(token.col));
     }
   }
-  std::cout << "Error: expected '}' at line " << token.line << ", col "
-            << token.col << std::endl;
-  exit(1);
+  throw std::runtime_error("Error: expected '}' at line " +
+                           std::to_string(token.line) + ", col " +
+                           std::to_string(token.col));
 };
 
 Value Parser::expect_value() {
 
   if (tokenizer.tokens().size() == 0) {
-    std::cout << "Error: empty input" << std::endl;
-    exit(1);
+    throw std::runtime_error("Error: empty input");
   }
   auto &token = tokenizer[idx];
   Value val;
@@ -57,9 +55,12 @@ Value Parser::expect_value() {
   case TokenType::STRING:
     idx++;
     return Value(ValueType::STRING, std::make_shared<std::string>(token.s_val));
-  case TokenType::NUMBER:
+  case TokenType::DOUBLE:
     idx++;
-    return Value(ValueType::NUMBER, std::make_shared<float>(token.int_val));
+    return Value(ValueType::DOUBLE, std::make_shared<double>(token.double_val));
+  case TokenType::INT:
+    idx++;
+    return Value(ValueType::INT, std::make_shared<int>(token.int_val));
   case TokenType::OPEN_BRACE:
     depth += 4;
     val = Value(ValueType::OBJECT, std::make_shared<Object>(expect_object()));
@@ -77,22 +78,21 @@ Value Parser::expect_value() {
     depth -= 4;
     return val;
   default:
-    std::cout << "Error: expected value at line " << token.line << ", col "
-              << token.col << std::endl;
-    exit(1);
+    throw std::runtime_error("Error: expected value at line " +
+                             std::to_string(token.line) + ", col " +
+                             std::to_string(token.col));
   }
 }
 
 Array Parser::expect_array() {
   if (tokenizer.tokens().size() == 0) {
-    std::cout << "Error: empty input" << std::endl;
-    exit(1);
+    throw std::runtime_error("Error: empty input");
   }
   auto &token = tokenizer[idx];
   if (token.type != TokenType::LEFT_BRACKET) {
-    std::cout << "Error: expected '[' at line " << token.line << ", col "
-              << token.col << std::endl;
-    exit(1);
+    throw std::runtime_error("Error: expected '[' at line " +
+                             std::to_string(token.line) + ", col " +
+                             std::to_string(token.col));
   }
 
   idx++;
@@ -110,9 +110,9 @@ Array Parser::expect_array() {
       }
     }
   }
-  std::cout << "Error: expected ']' at line " << token.line << ", col "
-            << token.col << std::endl;
-  exit(1);
+  throw std::runtime_error("Error: expected ']' at line " +
+                           std::to_string(token.line) + ", col " +
+                           std::to_string(token.col));
 }
 
 JSON Parser::parse() {

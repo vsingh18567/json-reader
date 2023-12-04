@@ -10,7 +10,8 @@
 
 enum class ValueType {
   STRING,
-  NUMBER,
+  DOUBLE,
+  INT,
   OBJECT,
   BOOL,
   ARRAY,
@@ -30,7 +31,7 @@ public:
   Object(int depth) : depth(depth) {}
   friend std::ostream &operator<<(std::ostream &os, const Object &jo);
 
-  template <typename T> void insert(const std::string key, T val);
+  template <typename T> inline void insert(const std::string key, T val);
 
   Value &operator[](const std::string key);
 
@@ -52,17 +53,17 @@ public:
   friend std::ostream &operator<<(std::ostream &os, const Array &ja);
 };
 
-using val_t = std::variant<sPtr<float>, sPtr<bool>, sPtr<std::string>,
-                           sPtr<Object>, sPtr<Array>>;
+using val_t = std::variant<sPtr<int>, sPtr<double>, sPtr<bool>,
+                           sPtr<std::string>, sPtr<Object>, sPtr<Array>>;
 
 struct Value {
   ValueType type;
   val_t value;
   Value() {}
   Value(int value)
-      : type(ValueType::NUMBER), value(std::make_shared<float>(value)) {}
-  Value(float value)
-      : type(ValueType::NUMBER), value(std::make_shared<float>(value)) {}
+      : type(ValueType::INT), value(std::make_shared<int>(value)) {}
+  Value(double value)
+      : type(ValueType::DOUBLE), value(std::make_shared<double>(value)) {}
   Value(bool value)
       : type(ValueType::BOOL), value(std::make_shared<bool>(value)) {}
   Value(std::string value)
@@ -76,14 +77,16 @@ struct Value {
     switch (type) {
     case ValueType::STRING:
       return "\"" + *std::get<sPtr<std::string>>(value) + "\"";
-    case ValueType::NUMBER:
-      return std::to_string(*std::get<sPtr<float>>(value));
+    case ValueType::DOUBLE:
+      return std::to_string(*std::get<sPtr<double>>(value));
     case ValueType::OBJECT:
       return std::get<sPtr<Object>>(value)->to_str();
     case ValueType::BOOL:
       return std::get<sPtr<bool>>(value) ? "true" : "false";
     case ValueType::ARRAY:
       return std::get<sPtr<Array>>(value)->to_str();
+    case ValueType::INT:
+      return std::to_string(*std::get<sPtr<int>>(value));
     }
   }
 
