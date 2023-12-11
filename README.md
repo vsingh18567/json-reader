@@ -1,4 +1,4 @@
-# jsonDerulo
+# JsonDerulo
 
 
 ## Description
@@ -14,7 +14,7 @@ Benchmarked against [nlohmann](https://json.nlohmann.me/integration/)'s JSON-rea
 
 ## Usage
 ```cpp
-    using namespace jsonDerulo;
+    using namespace JsonDerulo;
     std::ifstream ifs("simple.json");
     JSON js = read_json(ifs).value();
     Value nested = js["nested"]; 
