@@ -1,7 +1,7 @@
 #include <string>
 #include <vector>
 
-namespace json_reader {
+namespace jsonDerulo {
 
 enum class TokenType {
   OPEN_BRACE,
@@ -37,16 +37,16 @@ struct Token {
 class Tokenizer {
 private:
   bool _succeeded;
-  std::vector<json_reader::Token> _tokens;
+  std::vector<jsonDerulo::Token> _tokens;
   std::string s;
   void tokenize();
 
 public:
   Tokenizer(std::string s);
   bool succeeded();
-  std::vector<json_reader::Token> &tokens();
+  std::vector<jsonDerulo::Token> &tokens();
   void print_tokens();
-  json_reader::Token &operator[](int idx) { return _tokens[idx]; }
+  jsonDerulo::Token &operator[](int idx) { return _tokens[idx]; }
 };
 
-} // namespace json_reader
+} // namespace jsonDerulo

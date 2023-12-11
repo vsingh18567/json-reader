@@ -6,7 +6,7 @@
 #include <tuple>
 
 using namespace std::chrono;
-using namespace json_reader;
+using namespace jsonDerulo;
 #define TRIES 20
 
 void time_taken(std::string path) {
@@ -36,7 +36,7 @@ void time_taken(std::string path) {
     average_2 /= 1000;
     unit = "ms";
   }
-  std::cout << "JSON Reader: " << average_1 << unit << std::endl;
+  std::cout << "jsonDerulo: " << average_1 << unit << std::endl;
   std::cout << "Nlohmann JSON: " << average_2 << unit << std::endl;
 }
 

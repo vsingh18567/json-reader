@@ -1,4 +1,4 @@
-# JSON reader
+# jsonDerulo
 
 
 ## Description
@@ -14,6 +14,7 @@ Benchmarked against [nlohmann](https://json.nlohmann.me/integration/)'s JSON-rea
 
 ## Usage
 ```cpp
+    using namespace jsonDerulo;
     std::ifstream ifs("simple.json");
     JSON js = read_json(ifs).value();
     Value nested = js["nested"]; 
@@ -40,3 +41,4 @@ Benchmarked against [nlohmann](https://json.nlohmann.me/integration/)'s JSON-rea
 - templates
   - template specialization 
 - operator overloading (`operator[]` and `operator<<`)
+- namespaces

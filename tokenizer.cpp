@@ -1,7 +1,7 @@
 #include "tokenizer.hpp"
 #include <iostream>
 
-namespace json_reader {
+namespace jsonDerulo {
 
 std::string Token::to_str() {
   switch (type) {
@@ -148,4 +148,4 @@ void Tokenizer::print_tokens() {
   }
 }
 
-} // namespace json_reader
+} // namespace jsonDerulo

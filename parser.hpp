@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <variant>
 
-namespace json_reader {
+namespace jsonDerulo {
 
 #define sPtr std::shared_ptr
 
