@@ -44,18 +44,18 @@ public:
   gets the value at the given key. If the value is not of the given type,
   throws an exception
   */
-  template <typename T> sPtr<T> get(const std::string &key);
+  template <typename T> sPtr<T> get(const std::string &key) const;
   /*
   gets the value at the given key. If the value is not of the given type,
   returns the default value
   */
   template <typename T>
-  sPtr<T> get(const std::string &key, const T default_val);
+  sPtr<T> get(const std::string &key, const T default_val) const;
   /*
   gets the value at the given key. If the value is not of the given type,
   returns nullptr
   */
-  template <typename T> sPtr<T> try_get(const std::string &key);
+  template <typename T> sPtr<T> try_get(const std::string &key) const;
 };
 
 struct Array {
@@ -96,34 +96,20 @@ struct Value {
   Value(Array value)
       : type(ValueType::ARRAY), value(std::make_shared<Array>(value)) {}
   Value(ValueType t, val_t value) : type(t), value(value) {}
-  std::string to_str() const {
-    switch (type) {
-    case ValueType::STRING:
-      return "\"" + *std::get<sPtr<std::string>>(value) + "\"";
-    case ValueType::DOUBLE:
-      return std::to_string(*std::get<sPtr<double>>(value));
-    case ValueType::OBJECT:
-      return std::get<sPtr<Object>>(value)->to_str();
-    case ValueType::BOOL:
-      return std::get<sPtr<bool>>(value) ? "true" : "false";
-    case ValueType::ARRAY:
-      return std::get<sPtr<Array>>(value)->to_str();
-    case ValueType::INT:
-      return std::to_string(*std::get<sPtr<int>>(value));
-    }
-  }
-
+  std::string to_str() const;
   /*
   casts the value to the given type. If the value is not of the given type,
   throws an exception
   */
-  template <typename T> sPtr<T> cast() { return std::get<sPtr<T>>(value); }
+  template <typename T> sPtr<T> cast() const {
+    return std::get<sPtr<T>>(value);
+  }
 
   /*
   attempts to cast the value to the given type. If the value is not of the given
   type, returns nullptr
   */
-  template <typename T> sPtr<T> try_cast() {
+  template <typename T> sPtr<T> try_cast() const {
     if (std::get_if<sPtr<T>>(value)) {
       return std::get<sPtr<T>>(value);
     } else {
@@ -131,7 +117,7 @@ struct Value {
     }
   }
 
-  Value &operator[](const std::string key) {
+  Value &operator[](const std::string key) const {
     return std::get<sPtr<Object>>(value)->operator[](key);
   }
 

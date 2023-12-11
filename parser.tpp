@@ -168,7 +168,7 @@ std::ostream &operator<<(std::ostream &os, const Array &ja) {
 
 Value &Object::operator[](const std::string key) { return elements[key]; }
 
-template <typename T> sPtr<T> Object::get(const std::string &key) {
+template <typename T> sPtr<T> Object::get(const std::string &key) const {
   if (std::get_if<sPtr<T>>(&elements.at(key).value)) {
     return std::get<sPtr<T>>(elements.at(key).value);
   }
@@ -177,7 +177,7 @@ template <typename T> sPtr<T> Object::get(const std::string &key) {
 }
 
 template <typename T>
-sPtr<T> Object::get(const std::string &key, const T default_val) {
+sPtr<T> Object::get(const std::string &key, const T default_val) const {
   if (elements.find(key) == elements.end()) {
     return default_val;
   }
@@ -188,7 +188,7 @@ sPtr<T> Object::get(const std::string &key, const T default_val) {
   }
 }
 
-template <typename T> sPtr<T> Object::try_get(const std::string &key) {
+template <typename T> sPtr<T> Object::try_get(const std::string &key) const {
   if (elements.find(key) == elements.end()) {
     return nullptr;
   }
@@ -212,15 +212,19 @@ template <> void Object::insert(const std::string key, Object val) {
   elements.insert({key, Value(val)});
 }
 
-/*
-
-
-
-STATES:
-- waiting for {
-- waiting for key
-- waiting for :
-- waiting for value
-
-
-*/
+std::string Value::to_str() const {
+  switch (type) {
+  case ValueType::STRING:
+    return "\"" + *std::get<sPtr<std::string>>(value) + "\"";
+  case ValueType::DOUBLE:
+    return std::to_string(*std::get<sPtr<double>>(value));
+  case ValueType::OBJECT:
+    return std::get<sPtr<Object>>(value)->to_str();
+  case ValueType::BOOL:
+    return std::get<sPtr<bool>>(value) ? "true" : "false";
+  case ValueType::ARRAY:
+    return std::get<sPtr<Array>>(value)->to_str();
+  case ValueType::INT:
+    return std::to_string(*std::get<sPtr<int>>(value));
+  }
+}

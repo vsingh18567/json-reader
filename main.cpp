@@ -55,7 +55,7 @@ void benchmark() {
 }
 
 int main(int argc, char **argv) {
-  benchmark();
+  // benchmark();
 
   std::ifstream ifs("simple.json");
   auto js = read_json(ifs).value();
@@ -64,7 +64,8 @@ int main(int argc, char **argv) {
   std::cout << *nested_obj->get<std::string>("foo") << std::endl;
 
   auto nested2 = js.root.get<Object>("nested");
-  std::cout << (nested2 == nested_obj) << std::endl;
+  std::cout << "same obj? " << ((nested2 == nested_obj) ? "true" : "false")
+            << std::endl;
   js.root.insert("new_key", Value("new_value")); // insert a new key-value pair
 
   Object obj;
