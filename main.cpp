@@ -6,7 +6,7 @@
 #include <tuple>
 
 using namespace std::chrono;
-using namespace jsonDerulo;
+using namespace JsonDerulo;
 #define TRIES 20
 
 void time_taken(std::string path) {
@@ -75,8 +75,6 @@ int main(int argc, char **argv) {
       "new_obj",
       obj); // insert a new key-value pair with an object as the value
   std::cout << js << std::endl;
-
-  Value &val = js.root["new_obj"]["key2"];
 
   std::cout << js.root["new_obj"]["key2"] << std::endl; // access a value
 }

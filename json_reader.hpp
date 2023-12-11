@@ -3,7 +3,7 @@
 #include <iostream>
 #include <optional>
 
-namespace jsonDerulo {
+namespace JsonDerulo {
 
 std::optional<JSON> read_json(const std::string &s) {
   Tokenizer tokenizer(s);
@@ -21,4 +21,4 @@ std::optional<JSON> read_json(std::ifstream &ifs) {
   return read_json(s);
 }
 
-} // namespace jsonDerulo
+} // namespace JsonDerulo
