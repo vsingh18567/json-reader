@@ -35,11 +35,26 @@ public:
 
   template <typename T> inline void insert(const std::string key, T val);
 
+  /*
+  indexes into the object with the given key
+  */
   Value &operator[](const std::string key);
 
+  /*
+  gets the value at the given key. If the value is not of the given type,
+  throws an exception
+  */
   template <typename T> sPtr<T> get(const std::string &key);
+  /*
+  gets the value at the given key. If the value is not of the given type,
+  returns the default value
+  */
   template <typename T>
   sPtr<T> get(const std::string &key, const T default_val);
+  /*
+  gets the value at the given key. If the value is not of the given type,
+  returns nullptr
+  */
   template <typename T> sPtr<T> try_get(const std::string &key);
 };
 
@@ -51,10 +66,16 @@ public:
   std::vector<Value> elements;
   std::string to_str() const;
   Array(int depth) : depth(depth) {}
+  /*
+  returns the value at the given index
+  */
   Value &operator[](int idx) { return elements[idx]; }
   friend std::ostream &operator<<(std::ostream &os, const Array &ja);
 };
 
+/*
+the possible types of values in a JSON object
+*/
 using val_t = std::variant<sPtr<int>, sPtr<double>, sPtr<bool>,
                            sPtr<std::string>, sPtr<Object>, sPtr<Array>>;
 
@@ -92,8 +113,16 @@ struct Value {
     }
   }
 
+  /*
+  casts the value to the given type. If the value is not of the given type,
+  throws an exception
+  */
   template <typename T> sPtr<T> cast() { return std::get<sPtr<T>>(value); }
 
+  /*
+  attempts to cast the value to the given type. If the value is not of the given
+  type, returns nullptr
+  */
   template <typename T> sPtr<T> try_cast() {
     if (std::get_if<sPtr<T>>(value)) {
       return std::get<sPtr<T>>(value);
@@ -112,6 +141,10 @@ struct Value {
 struct JSON {
 
   Object root;
+
+  /*
+   * Returns a string representation of the JSON object
+   */
   std::string to_str() const { return root.to_str(); }
 
   friend std::ostream &operator<<(std::ostream &os, const JSON &json);
