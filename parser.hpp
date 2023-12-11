@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <variant>
 
+namespace json_reader {
+
 #define sPtr std::shared_ptr
 
 enum class ValueType {
@@ -133,3 +135,5 @@ public:
 
 #include "parser.tpp"
 #endif
+
+} // namespace json_reader

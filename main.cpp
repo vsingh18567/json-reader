@@ -6,6 +6,7 @@
 #include <tuple>
 
 using namespace std::chrono;
+using namespace json_reader;
 #define TRIES 20
 
 void time_taken(std::string path) {

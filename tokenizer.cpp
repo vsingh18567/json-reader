@@ -1,6 +1,8 @@
 #include "tokenizer.hpp"
 #include <iostream>
 
+namespace json_reader {
+
 std::string Token::to_str() {
   switch (type) {
   case TokenType::OPEN_BRACE:
@@ -145,3 +147,5 @@ void Tokenizer::print_tokens() {
     std::cout << t.to_str() << std::endl;
   }
 }
+
+} // namespace json_reader

@@ -1,6 +1,7 @@
-
 #include <string>
 #include <vector>
+
+namespace json_reader {
 
 enum class TokenType {
   OPEN_BRACE,
@@ -36,14 +37,16 @@ struct Token {
 class Tokenizer {
 private:
   bool _succeeded;
-  std::vector<Token> _tokens;
+  std::vector<json_reader::Token> _tokens;
   std::string s;
   void tokenize();
 
 public:
   Tokenizer(std::string s);
   bool succeeded();
-  std::vector<Token> &tokens();
+  std::vector<json_reader::Token> &tokens();
   void print_tokens();
-  Token &operator[](int idx) { return _tokens[idx]; }
+  json_reader::Token &operator[](int idx) { return _tokens[idx]; }
 };
+
+} // namespace json_reader
